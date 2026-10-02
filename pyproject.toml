@@ -44,9 +44,12 @@ issues = "https://github.com/googleanalytics/google-analytics-mcp/issues"
 analytics-mcp = "analytics_mcp.server:run_server"
 # The previous name of the script. Kept for backwards compatibility.
 google-analytics-mcp = "analytics_mcp.server:run_server"
+# Remote Streamable HTTP + Google OAuth server (requires the "remote" extra).
+analytics-mcp-remote = "analytics_mcp.remote.server:run_server"
 
 [project.optional-dependencies]
 dev = ["black", "nox >=2026.2.9, <2027"]
+remote = ["fastmcp>=3.2,<4"]
 
 [build-system]
 requires = ["setuptools>=82.0.0", "wheel"]
