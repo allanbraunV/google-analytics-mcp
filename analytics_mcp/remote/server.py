@@ -9,7 +9,8 @@ Environment variables:
   ALLOWED_DOMAINS       Comma-separated email domains allowed to sign in.
   JWT_SIGNING_KEY       Stable secret so issued tokens survive restarts.
   FASTMCP_HOME          Directory for OAuth state (mount a persistent volume).
-  GA_SA_JSON            Service account JSON (alternative to
+  GOOGLE_CREDENTIALS_JSON  Google credentials JSON: service account key or
+                        authorized_user file from gcloud ADC login (alternative to
                         GOOGLE_APPLICATION_CREDENTIALS pointing to a file).
   PORT                  Listen port (default 8080).
 """
@@ -33,14 +34,14 @@ def _require_env(name: str) -> str:
     return value
 
 
-def _setup_service_account_credentials() -> None:
-    """Writes GA_SA_JSON to a file and points ADC at it."""
-    sa_json = os.environ.get("GA_SA_JSON")
-    if not sa_json:
+def _setup_credentials() -> None:
+    """Writes GOOGLE_CREDENTIALS_JSON to a file and points ADC at it."""
+    credentials_json = os.environ.get("GOOGLE_CREDENTIALS_JSON")
+    if not credentials_json:
         return
-    fd, path = tempfile.mkstemp(prefix="ga-sa-", suffix=".json")
+    fd, path = tempfile.mkstemp(prefix="ga-credentials-", suffix=".json")
     with os.fdopen(fd, "w") as f:
-        f.write(sa_json)
+        f.write(credentials_json)
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path
 
 
@@ -95,7 +96,7 @@ def build_server() -> FastMCP:
 
 
 def run_server() -> None:
-    _setup_service_account_credentials()
+    _setup_credentials()
     build_server().run(
         transport="http",
         host="0.0.0.0",
